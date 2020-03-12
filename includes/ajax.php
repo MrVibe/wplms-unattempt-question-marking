@@ -41,36 +41,36 @@ class Wplms_Unattempt_Question_Ajax{
 			$question_id = $_POST['question_id'];
 			$user_id = $_POST['user_id'];
 			if(!empty($question_id) && !empty($quiz_id) && !empty($user_id)){
-			// copy like bp_course_save_question_quiz_answer //fake comment
-			$question_answer_args = apply_filters('bp_course_save_question_quiz_answer',array(
-				'comment_post_ID'=>$question_id,
-				'user_id'=>$user_id,
-				'comment_content'=>apply_filters('enable_unattempted_give_marks_ans',null),
-				'comment_date' => current_time('mysql'),
-				'comment_approved' => 1,
-			));
-			global $wpdb;
-			$comment_id = $wpdb->get_var("SELECT m.comment_id FROM {$wpdb->comments} as c LEFT JOIN {$wpdb->commentmeta} as m ON c.comment_ID = m.comment_id WHERE c.user_id = $user_id AND c.comment_post_ID = $question_id AND m.meta_key = 'quiz_id' AND m.meta_value = $quiz_id");
-			if(!empty($comment_id) && is_numeric($comment_id)){
-				$question_answer_args['comment_ID'] = $comment_id;
-				wp_update_comment($question_answer_args);
-			}else{
-				$comment_id = wp_insert_comment($question_answer_args);
-				if(!is_wp_error($comment_id)){
-					update_comment_meta($comment_id,'quiz_id',$quiz_id);
+				// copy like bp_course_save_question_quiz_answer //fake comment
+				$question_answer_args = apply_filters('bp_course_save_question_quiz_answer',array(
+					'comment_post_ID'=>$question_id,
+					'user_id'=>$user_id,
+					'comment_content'=>apply_filters('enable_unattempted_give_marks_ans',null),
+					'comment_date' => current_time('mysql'),
+					'comment_approved' => 1,
+				));
+				global $wpdb;
+				$comment_id = $wpdb->get_var("SELECT m.comment_id FROM {$wpdb->comments} as c LEFT JOIN {$wpdb->commentmeta} as m ON c.comment_ID = m.comment_id WHERE c.user_id = $user_id AND c.comment_post_ID = $question_id AND m.meta_key = 'quiz_id' AND m.meta_value = $quiz_id");
+				if(!empty($comment_id) && is_numeric($comment_id)){
+					$question_answer_args['comment_ID'] = $comment_id;
+					wp_update_comment($question_answer_args);
+				}else{
+					$comment_id = wp_insert_comment($question_answer_args);
+					if(!is_wp_error($comment_id)){
+						update_comment_meta($comment_id,'quiz_id',$quiz_id);
+					}
 				}
-			}
-			// form show
-			if(!empty($comment_id)){
-				echo '<span class="unattempted_marking">'.__('Marks Obtained','vibe').'<input type="number" value=0 class="form_field unattempted_marks" value=0 placeholder="'.__('Give marks','vibe').'">
-				<button class="give_marks_unattempted button" data-comment-id='.$comment_id.'  data-security='.wp_create_nonce('save_unattempted_question_marks').'>'.__('Give marks','vibe').'</button><span></span>
-				</span>';
-			}
+				// form show
+				if(!empty($comment_id)){
+					echo '<span class="unattempted_marking">'.__('Marks Obtained','vibe').'<input type="number" value=0 class="form_field unattempted_marks" value=0 placeholder="'.__('Give marks','vibe').'">
+					<button class="give_marks_unattempted button" data-comment-id='.$comment_id.'  data-security='.wp_create_nonce('save_unattempted_question_marks').'>'.__('Give marks','vibe').'</button><span></span>
+					</span>';
+				}
+			}	
 		}else{
 			echo __('Security Failed','vibe');
-		}	
-		die();
 		}
+		die();
 	}
 	
 	function save_unattempted_question_marks(){
