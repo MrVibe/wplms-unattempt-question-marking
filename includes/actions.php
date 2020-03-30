@@ -36,10 +36,31 @@ class Wplms_Unattempt_Question_Actions{
 	}
 
   function _wplms_quiz_evaluate_per_question_html_unattempted($question_id,$quiz_id,$user_id,$marked_answer_id){
-    if(empty($marked_answer_id) && !empty($question_id)){
-      echo '<button href="#" class="enable_unattempted_give_marks button" data-question-id='.$question_id.' 
-      data-quiz-id='.$quiz_id.'  data-security='.wp_create_nonce('show_form_unattempted_question_marks').' >'.__('Show Form For Unattempt Marking','vibe').'</button>';
+
+    // check if any/single question attempletd then show marks form button 
+    $form_button = 0;
+    $questions = bp_course_get_quiz_questions($quiz_id,$user_id);
+    if(isset($questions) && is_array($questions) && is_Array($questions['ques'])){
+      foreach($questions['ques'] as $question){
+        global $wpdb;
+        if(isset($question) && $question !='' && is_numeric($question)){
+          $template = BP_Course_Template::init();
+          $comment = $template->get_answer_object($quiz_id,$question,$user_id);
+          if(!empty($comment->comment_ID)){
+            $form_button = 1;
+            break;
+          }
+        }
+      }
+    }
+
+    if($form_button ==  1){
+      if(empty($marked_answer_id) && !empty($question_id)){
+        echo '<button href="#" class="enable_unattempted_give_marks button" data-question-id='.$question_id.' 
+        data-quiz-id='.$quiz_id.'  data-security='.wp_create_nonce('show_form_unattempted_question_marks').' >'.__('Show Form For Unattempt Marking','vibe').'</button>';
+      }  
     }  
+    
   }
   function show_script_unattempted($quiz_id,$user_id){
     ?>
