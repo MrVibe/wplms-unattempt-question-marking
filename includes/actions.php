@@ -36,14 +36,15 @@ class Wplms_Unattempt_Question_Actions{
 	}
 
   function _wplms_quiz_evaluate_per_question_html_unattempted($question_id,$quiz_id,$user_id,$marked_answer_id){
+
      if(empty($marked_answer_id) && !empty($question_id)){
         // check if any/single question attempletd then show marks form button 
-        $form_button = 0;
+        $form_button = apply_filters('show_unattempt_button_always',0);
         $questions = bp_course_get_quiz_questions($quiz_id,$user_id);
         if(isset($questions) && is_array($questions) && is_Array($questions['ques'])){
           foreach($questions['ques'] as $question){
             global $wpdb;
-            if(isset($question) && $question !='' && is_numeric($question)){
+            if(isset($question) && is_numeric($question)){
               $template = BP_Course_Template::init();
               $comment = $template->get_answer_object($quiz_id,$question,$user_id);
               if(!empty($comment->comment_ID)){
